@@ -1,0 +1,18 @@
+{
+	"modules":
+	[
+		"Shaders/TexCoordNormalPassThrough.vert",
+		"Shaders/DiffuseTexture.frag"
+	],
+	
+	"samplers":
+	{
+		"texture":
+		{
+			"xWrap": "Clamp",
+			"yWrap": "Clamp",
+			
+			"anisotropy": 4
+		}
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"output": "build",
+	"input": [
+		"assets",
+		"../Kratos/assets"
+	]
+}

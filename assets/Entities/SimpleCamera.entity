@@ -1,0 +1,31 @@
+{
+	"name": "Main Camera",
+	"components": [
+		{
+			"type": "kratos.component.transform.Transform",
+			"representation": {
+				"position": [38000, 30,11000]
+			}
+		},
+		
+		{
+			"type": "kratos.component.camera.Camera",
+			"representation": {
+				"main": true,
+				"projection":
+				{
+					"nearPlane": 0.5,
+					"farPlane": 10000
+				}
+			}
+		},
+		
+		{
+			"type": "app.CameraMovement",
+			"representation":
+			{
+				"speed": 100
+			}
+		}
+	]
+}

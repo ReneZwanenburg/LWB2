@@ -1,0 +1,15 @@
+{
+	"name": "lwb2",
+	"description": "Sensor data viewer",
+	"copyright": "Copyright © 2015, Rene Zwanenburg",
+	"authors": ["Rene Zwanenburg"],
+
+	"targetPath": "build",
+	"workingDirectory": "build",
+	"preBuildCommands": ["CompileResources.bat"],
+
+	"dependencies": 
+	{
+		"kratos": {"path": "../Kratos"}
+	}
+}

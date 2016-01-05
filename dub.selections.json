@@ -1,0 +1,11 @@
+{
+	"versions": {
+		"derelict-ode": "1.1.2",
+		"derelict-gl3": "1.0.17",
+		"derelict-il": "~master",
+		"derelict-glfw3": "1.1.0",
+		"derelict-util": "2.0.4",
+		"derelict-assimp3": "1.0.1"
+	},
+	"fileVersion": 1
+}

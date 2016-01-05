@@ -1,0 +1,11 @@
+{
+	"Shader":
+	{
+		"program": "ShaderPrograms/Simple.prog",
+		
+		"uniforms":
+		{
+			"color": [0.5, 0.5, 0.5]
+		}
+	}
+}
