@@ -1,19 +1,6 @@
 {
 	"name": "Rotterdam",
 	
-	"components":
-	[
-		{
-			"type": "kratos.component.renderer.Renderer",
-			"representation":
-			{
-				"color": [0, 1, 1, 1],
-				"depth": 1,
-				"stencil": 0
-			}
-		}
-	],
-	
 	"entities":
 	[
 		"Entities/Sun.entity",

@@ -1,16 +1,19 @@
 {
 	"name": "Main Camera",
-	"components": [
+	"components":
+	[
 		{
 			"type": "kratos.component.transform.Transform",
-			"representation": {
-				"position": [38000, 30,11000]
+			"representation":
+			{
+				"position": [38000, 80, 11000]
 			}
 		},
 		
 		{
 			"type": "kratos.component.camera.Camera",
-			"representation": {
+			"representation":
+			{
 				"main": true,
 				"projection":
 				{
