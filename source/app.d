@@ -30,7 +30,7 @@ class TerrainTile : Component
 
 	void frameUpdate()
 	{
-		auto distance = (cameraSelection.mainCamera.transform.position.xz - transform.position.xz).magnitude;
+		auto distance = (cameraSelection.mainCamera.transform.position - transform.position).magnitude;
 		auto lod = (distance / 1024).max(0).log2.max(0).to!uint;
 		
 		if(currentLevel != lod)
