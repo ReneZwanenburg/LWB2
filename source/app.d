@@ -6,6 +6,9 @@ import kratos.graphics.texture;
 import kratos.resource.loader.textureloader;
 import kratos.component.time;
 import kgl3n;
+import std.algorithm.comparison : max;
+import std.math;
+import std.conv;
 
 class TerrainTile : Component
 {
@@ -21,30 +24,19 @@ class TerrainTile : Component
 		}
 
 		enum textureUniformName = "texture";
-		Texture unloadedReplacement;
-		float loadDistance = 1024 * 4;
-		float unloadDistance = 1024 * 5;
-		bool loaded;
-	}
-
-	void initialize()
-	{
-		unloadedReplacement = meshRenderer.mesh.renderState.shader.uniforms.getTexture(textureUniformName);
+		
+		uint currentLevel = -1;
 	}
 
 	void frameUpdate()
 	{
 		auto distance = (cameraSelection.mainCamera.transform.position.xz - transform.position.xz).magnitude;
-
-		if(!loaded && distance <= loadDistance)
+		auto lod = (distance / 1024).max(0).log2.max(0).to!uint;
+		
+		if(currentLevel != lod)
 		{
-			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = loadTexture(textureName);
-			loaded = true;
-		}
-		else if(loaded && distance > unloadDistance)
-		{
-			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = unloadedReplacement;
-			loaded = false;
+			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = loadTexture(textureName, lod);
+			currentLevel = lod;
 		}
 	}
 }

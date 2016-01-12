@@ -17,8 +17,8 @@
 				"main": true,
 				"projection":
 				{
-					"nearPlane": 0.5,
-					"farPlane": 10000
+					"nearPlane": 1,
+					"farPlane": 50000
 				}
 			}
 		},
