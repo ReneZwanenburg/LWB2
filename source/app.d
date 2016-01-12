@@ -52,13 +52,15 @@ class TerrainTile : Component
 class CameraMovement : Component
 {
 	@optional:
-	float sensitivity = .002f;
-	float speed = 1;
-	float speedMultiplier = 1.5f;
+	float mouseSensitivity = .002f;
+	float baseSpeed = 1;
+	float minSpeed = 0.5f;
+	float maxSpeed = 1000;
+	vec3 speedMultiplier = vec3(0, 0.5, 0);
+	vec3 ypr;
+	
 	private @dependency(Dependency.Direction.Write) Transform transform;
 	private @dependency Time time;
-
-	vec3 ypr;
 
 	void frameUpdate()
 	{
@@ -66,16 +68,18 @@ class CameraMovement : Component
 	
 		if(mouse.grabbed)
 		{
-			ypr.x += -mouse.xAxis.value * sensitivity;
-			ypr.y += -mouse.yAxis.value * sensitivity;
+			ypr.x += -mouse.xAxis.value * mouseSensitivity;
+			ypr.y += -mouse.yAxis.value * mouseSensitivity;
 			ypr.y = ypr.y.clamp(-PI / 2.5, PI / 2.5);
 
 			transform.rotation = quat.eulerRotation(ypr);
 		}
 		
-		auto forward = ((transform.rotation * vec3(0, 0, -1)) * vec3(1, 0, 1)).normalized * speed * time.delta;
-		auto right = (transform.rotation * vec3(1, 0, 0)) * speed * time.delta;
-		auto up = vec3(0, 1, 0) * speed * time.delta;
+		auto effectiveSpeed = (baseSpeed * dot(transform.position, speedMultiplier)).clamp(minSpeed, maxSpeed) * time.delta;
+		
+		auto forward = ((transform.rotation * vec3(0, 0, -1)) * vec3(1, 0, 1)).normalized * effectiveSpeed;
+		auto right = (transform.rotation * vec3(1, 0, 0)) * effectiveSpeed;
+		auto up = vec3(0, 1, 0) * effectiveSpeed;
 
 		if(keyboard["W"].pressed)
 		{
@@ -100,14 +104,6 @@ class CameraMovement : Component
 		if(keyboard["Z"].pressed)
 		{
 			transform.position = transform.position - up;
-		}
-		if(keyboard["E"].justPressed)
-		{
-			speed /= speedMultiplier;
-		}
-		if(keyboard["R"].justPressed)
-		{
-			speed *= speedMultiplier;
 		}
 		
 		if(mouse.buttons[0].justReleased)
