@@ -1,3 +1,56 @@
+[
+{
+	"name": "Cursor",
+	
+	"components":
+	[
+		{
+			"type": "kratos.component.transform.Transform",
+			"representation":
+			{
+				"position": [38000, 0, 11000]
+			}
+		},
+		
+		{
+			"type": "app.Cursor"
+		},
+		
+		{
+			"type": "kratos.component.meshrenderer.MeshRenderer",
+			"representation":
+			{
+				"mesh": "Meshes/Selection.obj",
+				"renderState": "RenderStates/Selection.renderstate"
+			}
+		}
+	]
+},
+
+{
+	"name": "Camera Anchor",
+	
+	"components":
+	[
+		{
+			"type": "kratos.component.transform.Transform",
+			"representation":
+			{
+				"position": [38000, 0, 11000]
+			}
+		},
+		
+		{
+			"type": "app.CameraAnchor",
+			
+			"representation":
+			{
+				"ypr": [0, -1, 0]
+			}
+		},
+	]
+},
+
 {
 	"name": "Main Camera",
 	"components":
@@ -6,7 +59,7 @@
 			"type": "kratos.component.transform.Transform",
 			"representation":
 			{
-				"position": [38000, 80, 11000]
+				"position": [0, 0, 250]
 			}
 		},
 		
@@ -18,17 +71,14 @@
 				"projection":
 				{
 					"nearPlane": 1,
-					"farPlane": 50000
+					"farPlane": 10000
 				}
 			}
 		},
 		
 		{
-			"type": "app.CameraMovement",
-			"representation":
-			{
-				"speed": 100
-			}
+			"type": "app.CameraMovement"
 		}
 	]
 }
+]

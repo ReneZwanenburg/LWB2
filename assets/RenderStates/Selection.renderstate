@@ -1,0 +1,19 @@
+{
+	"queue": "Transparent",
+	
+	"DepthTest":
+	{
+		"read": false,
+		"write": false
+	},
+	
+	"Shader":
+	{
+		"program": "ShaderPrograms/Selection.prog",
+		
+		"uniforms":
+		{
+			"texture": "Textures/Selection.png"
+		}
+	}
+}

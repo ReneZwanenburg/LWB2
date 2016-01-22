@@ -1,0 +1,7 @@
+{
+	"modules":
+	[
+		"Shaders/TexCoordPassThrough.vert",
+		"Shaders/Selection.frag"
+	]
+}
