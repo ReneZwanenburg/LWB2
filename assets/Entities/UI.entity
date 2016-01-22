@@ -1,0 +1,27 @@
+[
+	{
+		"name": "Test Panel",
+		"components":
+		[
+			{
+				"type": "kratos.component.transform.Transform",
+				"representation":
+				{
+					"position": [0, 0, 0]
+				}
+			},
+			
+			{
+				"type": "kratos.ui.panel.TextPanel",
+				"representation":
+				{
+					"size": [0.5, 0.5],
+					"fontSize": 0.05,
+					"font": "Fonts/OpenSans-Regular.ttf",
+					"renderState": "RenderStates/UI/TextPanel.renderstate",
+					"text": "testestesteste"
+				}
+			}
+		]
+	}
+]
