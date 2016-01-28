@@ -13,7 +13,6 @@
 		"Entities/Sun.entity",
 		"Entities/SimpleCamera.entity",
 		"Entities/Terrain.entity",
-		"Entities/Rotterdam.entity",
-		"Entities/UI.entity"
+		"Entities/Rotterdam.entity"
 	]
 }

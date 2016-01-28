@@ -24,8 +24,9 @@ final class Sensor : Component
 	}
 
 	private SensorData currentData;
-	private Entity uiEntity;
-	private TextPanel tempTextPanel;
+
+	private Entity uiRootEntity;
+	private TextPanel[SensorData.init.data.length] sensorReadings;
 
 	this(SensorId id)
 	{
@@ -34,14 +35,26 @@ final class Sensor : Component
 
 	void initialize()
 	{
-		uiEntity = scene.createEntity();
-		tempTextPanel = uiEntity.components.add!TextPanel(vec2(0.5, 0.5), 0.05, "Fonts/OpenSans-Regular.ttf", "RenderStates/UI/TextPanel.renderstate");
-		tempTextPanel.text = "Test Sensor";
+		uiRootEntity = scene.createEntity();
+		sensorReadings[0] = uiRootEntity.components.add!TextPanel(vec2(0.5, 0.5), 0.05, "Fonts/OpenSans-Regular.ttf", "RenderStates/UI/TextPanel.renderstate");
+		sensorReadings[0].text = "Test Sensor";
 		//TODO: Create gui
+	}
+
+	void frameUpdate()
+	{
+		auto camera = cameraSelection.mainCamera;
+		
+		auto uiTransform = uiRootEntity.components.first!Transform;
+		auto clipCoords = camera.viewProjectionMatrix * vec4(transform.position, 1);
+		uiTransform.position = vec3(clipCoords.xy / clipCoords.w, 0);
 	}
 
 	void receive(SensorData data)
 	{
+		import std.stdio;
+		writeln("recv");
+
 		if(data !is currentData)
 		{
 			currentData = data;
@@ -54,12 +67,6 @@ final class Sensor : Component
 
 			// TODO: Update
 		}
-
-		auto camera = cameraSelection.mainCamera;
-
-		auto uiTransform = uiEntity.components.first!Transform;
-		auto clipCoords = camera.viewProjectionMatrix * vec4(transform.position, 1);
-		uiTransform.position = vec3(clipCoords.xy / clipCoords.w, 0);
 	}
 }
 
@@ -76,7 +83,7 @@ final class SensorDataSource : SceneComponent
 		//TODO: Get input range of new messages
 		SensorData[] received;
 
-		if(updateIn -= time.delta <= 0)
+		if((updateIn -= time.delta) <= 0)
 		{
 			updateIn = 10;
 			received ~= SensorData(vec2d(38000, 11000), vec2d(38000, 11000));
