@@ -1,6 +1,13 @@
 {
 	"name": "Rotterdam",
 	
+	"components":
+	[
+		{
+			"type": "sensor.SensorDataSource"
+		}
+	],
+	
 	"entities":
 	[
 		"Entities/Sun.entity",
