@@ -41,6 +41,7 @@ final class Sensor : Component
 	this(SensorId id)
 	{
 		this.id = id;
+		currentData.data[] = float.nan;
 	}
 
 	void initialize()
