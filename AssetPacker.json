@@ -2,6 +2,7 @@
 	"output": "build",
 	"input": [
 		"assets",
+		"GeoData/assets",
 		"../Kratos/assets"
 	]
 }
