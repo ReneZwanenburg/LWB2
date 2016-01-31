@@ -124,10 +124,10 @@ final class SensorDataSource : SceneComponent
 	{
 		testSensorData =
 		[
-			SensorData("Test Sensor 1", vec2d(51.897877, 4.418613999999934)),
-			SensorData("Test Sensor 2", vec2d(51.91, 4.45)),
-			SensorData("Test Sensor 3", vec2d(51.85, 4.46)),
-			SensorData("Test Sensor 4", vec2d(51.95, 4.455))
+			SensorData("Test Sensor 1", vec2d(51.897877, 4.418614)),
+			SensorData("Test Sensor 2", vec2d(51.917301, 4.484350)),
+			SensorData("Test Sensor 3", vec2d(51.924411, 4.477744)),
+			SensorData("Test Sensor 4", vec2d(51.922973, 4.496150))
 		];
 	}
 
