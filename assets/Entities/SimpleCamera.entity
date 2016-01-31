@@ -1,33 +1,5 @@
 [
 {
-	"name": "Cursor",
-	
-	"components":
-	[
-		{
-			"type": "kratos.component.transform.Transform",
-			"representation":
-			{
-				"position": [38000, 0, 11000]
-			}
-		},
-		
-		{
-			"type": "app.Cursor"
-		},
-		
-		{
-			"type": "kratos.component.meshrenderer.MeshRenderer",
-			"representation":
-			{
-				"mesh": "Meshes/Selection.obj",
-				"renderState": "RenderStates/Selection.renderstate"
-			}
-		}
-	]
-},
-
-{
 	"name": "Camera Anchor",
 	
 	"components":

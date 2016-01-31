@@ -1,6 +1,7 @@
 ﻿module sensor;
 
 import kratos.component.transform;
+import kratos.component.meshrenderer;
 import kratos.component.camera;
 import kratos.component.time;
 import kratos.ui.panel;
@@ -9,6 +10,8 @@ import kratos.util;
 import rdconvert;
 
 import kgl3n;
+
+import std.stdio;
 
 alias SensorId = string;
 
@@ -30,6 +33,10 @@ final class Sensor : Component
 	private TextPanel header;
 	private TextPanel[SensorData.init.data.length] sensorReadings;
 	private float[sensorReadings.length] timeSinceUpdate = 0;
+
+	private immutable string[] readingNames = ["Reading 1", "Reading 2", "Reading 3", "Reading 4"];
+
+	private SensorLocationIndicator locationIndicator;
 
 	this(SensorId id)
 	{
@@ -54,10 +61,15 @@ final class Sensor : Component
 
 		enum
 			numReadings = sensorReadings.length,
+			readingHeaderFontSize = 0.025f,
+			readingHeaderSize = vec2(headerSize.x / numReadings, readingHeaderFontSize),
+			readingHeaderSpacing = 0.025f,
+			readingHeaderBaseOffset = vec2(-readingHeaderSize.x * (numReadings - 1) / 2.0, headerOffset.y - headerFontSize - readingHeaderSpacing),
+
 			readingFontSize = 0.05f,
-			readingSize = vec2(headerSize.x / numReadings, headerSize.y),
+			readingSize = vec2(headerSize.x / numReadings, readingFontSize),
 			readingSpacing = 0.025f,
-			readingBaseOffset = vec2(-readingSize.x * (numReadings - 1) / 2.0, headerOffset.y - headerFontSize - readingSpacing);
+			readingBaseOffset = vec2(readingHeaderBaseOffset.x, readingHeaderBaseOffset.y - readingHeaderFontSize - readingSpacing);
 
 		uiRootEntity = scene.createEntity();
 		uiRootEntity.components.add!Panel(panelSize, panelOffset, panelRenderState);
@@ -66,9 +78,15 @@ final class Sensor : Component
 
 		foreach(i; 0..numReadings)
 		{
+			auto readingHeader = uiRootEntity.components.add!TextPanel(readingHeaderSize, readingHeaderBaseOffset + i * vec2(readingHeaderSize.x, 0), readingHeaderFontSize, fontFile, headerRenderState);
+			readingHeader.text = readingNames[i];
+
 			sensorReadings[i] = uiRootEntity.components.add!TextPanel(readingSize, readingBaseOffset + i * vec2(readingSize.x, 0), readingFontSize, fontFile, headerRenderState);
 		}
-		//TODO: Create gui
+
+		auto indicatorEntity = scene.createEntity();
+		locationIndicator = indicatorEntity.components.add!SensorLocationIndicator;
+		locationIndicator.transform.parent = transform;
 	}
 
 	void frameUpdate()
@@ -78,8 +96,6 @@ final class Sensor : Component
 		auto uiTransform = uiRootEntity.components.first!Transform;
 		auto clipCoords = camera.viewProjectionMatrix * vec4(transform.position, 1);
 		uiTransform.position = vec3(clipCoords.xy / clipCoords.w, 0);
-
-
 
 		foreach(i, panel; sensorReadings)
 		{
@@ -91,6 +107,8 @@ final class Sensor : Component
 
 	void receive(SensorData data)
 	{
+		locationIndicator.timeSinceUpdate = 0;
+
 		if(data !is currentData)
 		{
 			auto worldCoords = gpsToRd(data.latLong.x, data.latLong.y).rdToWorld();
@@ -108,6 +126,31 @@ final class Sensor : Component
 
 			currentData = data;
 		}
+	}
+}
+
+final class SensorLocationIndicator : Component
+{
+	private @dependency
+	{
+		Transform transform;
+		CameraSelection cameraSelection;
+		Time time;
+	}
+
+	private float timeSinceUpdate = 0;
+	private MeshRenderer meshRenderer;
+
+	void initialize()
+	{
+		meshRenderer = owner.components.add!MeshRenderer("Meshes/SensorLocationIndicator.obj", "RenderStates/SensorLocationIndicator.renderstate");
+	}
+
+	void frameUpdate()
+	{
+		transform.scale = (transform.worldPosition - cameraSelection.mainCamera.transform.worldPosition).magnitude;
+		meshRenderer.mesh.renderState.shader.uniforms["color"] = lerp(vec3(0, 1, 0), vec3(), smoothStep(0, 2, timeSinceUpdate));
+		timeSinceUpdate += time.delta;
 	}
 }
 
@@ -134,23 +177,25 @@ final class SensorDataSource : SceneComponent
 	void frameUpdate()
 	{
 		//TODO: Get input range of new messages
-		//SensorData[] received;
+		SensorData[] received;
 
 		if((updateIn -= time.delta) <= 0)
 		{
-			updateIn = 10;
+			updateIn = 2;
 
 			import std.random : uniform;
-			foreach(ref data; testSensorData)
+
+			auto sensorToUpdate = uniform(0, testSensorData.length);
+
+			foreach(ref val; testSensorData[sensorToUpdate].data)
 			{
-				foreach(ref val; data.data)
-				{
-					val = uniform(0, 5);
-				}
+				val = uniform(0, 5);
 			}
+
+			received ~= testSensorData[sensorToUpdate];
 		}
 
-		foreach(data; testSensorData)
+		foreach(data; received)
 		{
 			auto sensor = sensors.getOrAdd(data.id, createNewSensor(data.id));
 			sensor.receive(data);

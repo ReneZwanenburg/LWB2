@@ -1,6 +1,7 @@
 #version 330
 
 uniform sampler2D texture;
+uniform vec3 color;
 
 in vec2 texCoord;
 
@@ -12,5 +13,5 @@ void main()
 	
 	if(alpha < 0.5) discard;
 	
-	albedo = vec4(0, 0, 0, 0);
+	albedo = vec4(color, 0);
 }

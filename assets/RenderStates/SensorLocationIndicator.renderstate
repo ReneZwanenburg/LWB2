@@ -1,0 +1,20 @@
+{
+	"queue": "Transparent",
+	
+	"DepthTest":
+	{
+		"read": false,
+		"write": false
+	},
+	
+	"Shader":
+	{
+		"program": "ShaderPrograms/SensorLocationIndicator.prog",
+		
+		"uniforms":
+		{
+			"texture": "Textures/SensorLocationIndicator.png",
+			"color": [0, 0, 0]
+		}
+	}
+}

@@ -1,3 +1,23 @@
 {
-	"parent": "RenderStates/UI/Panel.renderstate"
+	"DepthTest":
+	{
+		"read": false,
+		"write": false
+	},
+	
+	"Blend":
+	{
+		"enabled": true
+	},
+
+	"Shader":
+	{
+		"program": "ShaderPrograms/UI/Panel.prog",
+		
+		"uniforms":
+		{
+			"color": [1, 1, 1, 1],
+			"texture": "Textures/SensorPanelBackground.png"
+		}
+	}
 }

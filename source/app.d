@@ -42,55 +42,6 @@ class TerrainTile : Component
 	}
 }
 
-class Cursor : Component
-{
-	private @dependency
-	{
-		Transform transform;
-		Time time;
-		CameraSelection cameraSelection;
-	}
-	
-	float mouseSensitivity = 0.005;
-	vec3 speedMultiplier = vec3(0, 1, 0);
-	
-	private
-	{
-		CameraMovement movement;
-	}
-	
-	void initialize()
-	{
-		movement = cameraSelection.mainCamera.owner.components.first!CameraMovement;
-	}
-	
-	void frameUpdate()
-	{
-		import kratos.input;
-		
-		transform.scale = (transform.worldPosition - movement.transform.worldPosition).magnitude;
-		transform.frameUpdate();
-		
-		auto scaledSpeed = (mouseSensitivity * dot(movement.transform.worldPosition, speedMultiplier));
-		
-		auto forward = ((movement.transform.worldMatrix * vec4(0, 0, -1, 0)).xyz * vec3(1, 0, 1)).normalized;
-		auto right = ((movement.transform.worldMatrix * vec4(1, 0, 0, 0)).xyz * vec3(1, 0, 1)).normalized;
-	
-		if(mouse.grabbed && !mouse.buttons[1].pressed)
-		{
-			transform.position =
-				transform.position +
-				forward * -(mouse.yAxis.value * scaledSpeed) +
-				right * (mouse.xAxis.value * scaledSpeed);
-		}
-		
-		if(mouse.buttons[0].justReleased)
-		{
-			mouse.grabbed = !mouse.grabbed;
-		}
-	}
-}
-
 class CameraAnchor : Component
 {
 	@optional:
@@ -100,56 +51,39 @@ class CameraAnchor : Component
 	private @dependency CameraSelection cameraSelection;
 	
 	vec3 ypr = vec3(0, 0, 0);
-	float mouseSensitivity = 0.005;
+	float mouseRotateSensitivity = 0.005;
+	float mouseMoveSensitivity = 0.005;
 	
 	float speedMaxDist = 250;
 	float maxSpeed = 1000;
 	
-	private Cursor cursor;
-	
-	private Transform.ChangedRegistration cursorTransformChanged;
-	
 	void initialize()
 	{
 		cameraSelection.mainCamera.transform.parent = transform;
-
-		foreach(entity; scene.entities)
-		{
-			auto cursor = entity.components.first!Cursor;
-			if(cursor !is null)
-			{
-				this.cursor = cursor;
-				break;
-			}
-		}
-		
-		cursorTransformChanged = cursor.transform.onWorldTransformChanged.register(&updateTarget);
-	}
-	
-	private void updateTarget(Transform transform)
-	{
-		
 	}
 
 	void frameUpdate()
 	{
 		import kratos.input;
-		
-		auto targetVector = cursor.transform.worldPosition - transform.worldPosition;
-		auto dist = targetVector.magnitude;
-		
-		auto currSpeed = smoothStep(0, speedMaxDist, dist) * maxSpeed;
-		auto movementThisFrame = targetVector.normalized * currSpeed * time.delta;
-		
-		transform.position += movementThisFrame;
-		
+
 		if(mouse.buttons[1].pressed)
 		{
-			ypr.x = (ypr.x + -mouse.xAxis.value * mouseSensitivity) % (PI * 2);
-			ypr.y = (ypr.y + -mouse.yAxis.value * mouseSensitivity) % (PI * 2);
+			ypr.x = (ypr.x + -mouse.xAxis.value * mouseRotateSensitivity) % (PI * 2);
+			ypr.y = (ypr.y + -mouse.yAxis.value * mouseRotateSensitivity) % (PI * 2);
 		}
-		
+
 		transform.rotation = quat.eulerRotation(ypr);
+
+		if(mouse.buttons[0].pressed)
+		{
+			auto forward = ((transform.rotation * vec3(0, 0, -1)) * vec3(1, 0, 1)).normalized;
+			auto right = ((transform.rotation * vec3(1, 0, 0)) * vec3(1, 0, 1)).normalized;
+			
+			transform.position += 
+				(forward * mouse.yAxis.value + right * -mouse.xAxis.value) * 
+				cameraSelection.mainCamera.transform.position.z *
+				mouseMoveSensitivity;
+		}
 	}
 }
 
@@ -198,7 +132,6 @@ class CameraMovement : Component
 static this()
 {
 	registerComponent!TerrainTile;
-	registerComponent!Cursor;
 	registerComponent!CameraAnchor;
 	registerComponent!CameraMovement;
 }
