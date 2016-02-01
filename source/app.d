@@ -70,6 +70,7 @@ class CameraAnchor : Component
 		{
 			ypr.x = (ypr.x + -mouse.xAxis.value * mouseRotateSensitivity) % (PI * 2);
 			ypr.y = (ypr.y + -mouse.yAxis.value * mouseRotateSensitivity) % (PI * 2);
+			ypr.y = clamp(ypr.y, -PI * 0.45, -PI * 0.05);
 		}
 
 		transform.rotation = quat.eulerRotation(ypr);
