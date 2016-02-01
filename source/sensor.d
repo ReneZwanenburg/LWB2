@@ -4,6 +4,7 @@ import kratos.component.transform;
 import kratos.component.meshrenderer;
 import kratos.component.camera;
 import kratos.component.time;
+import kratos.component.spatialpartitioning;
 import kratos.ui.panel;
 import kratos.ecs;
 import kratos.util;
@@ -14,6 +15,8 @@ import kgl3n;
 import std.stdio;
 
 alias SensorId = string;
+
+alias SensorPartitioning = SpatialPartitioning!Sensor;
 
 final class Sensor : Component
 {
@@ -30,6 +33,7 @@ final class Sensor : Component
 	private SensorData currentData;
 
 	private Entity uiRootEntity;
+	private Transform uiTransform;
 	private TextPanel header;
 	private TextPanel[SensorData.init.data.length] sensorReadings;
 	private float[sensorReadings.length] timeSinceUpdate = 0;
@@ -38,10 +42,20 @@ final class Sensor : Component
 
 	private SensorLocationIndicator locationIndicator;
 
+	private Timer makeVisibleTimer;
+	private Timer hideTimer;
+	private bool _visible;
+
 	this(SensorId id)
 	{
 		this.id = id;
 		currentData.data[] = float.nan;
+		scene.components.firstOrAdd!SensorPartitioning().register(this);
+	}
+
+	~this()
+	{
+		scene.components.firstOrAdd!SensorPartitioning().deregister(this);
 	}
 
 	void initialize()
@@ -74,6 +88,10 @@ final class Sensor : Component
 
 		uiRootEntity = scene.createEntity();
 		uiRootEntity.components.add!Panel(panelSize, panelOffset, panelRenderState);
+		uiTransform = uiRootEntity.components.first!Transform;
+
+		uiTransform.rotation = quat.eulerRotation(vec3(PI * 0.5, 0, 0));
+
 		header = uiRootEntity.components.add!TextPanel(headerSize, headerOffset, headerFontSize, fontFile, headerRenderState);
 		header.text = id;
 
@@ -88,13 +106,29 @@ final class Sensor : Component
 		auto indicatorEntity = scene.createEntity();
 		locationIndicator = indicatorEntity.components.add!SensorLocationIndicator;
 		locationIndicator.transform.parent = transform;
+
+		makeVisibleTimer = owner.components.add!Timer(0.4);
+		makeVisibleTimer.onUpdate += &makeVisibleCallback;
+		hideTimer = owner.components.add!Timer(0.25);
+		hideTimer.onUpdate += &hideCallback;
+	}
+
+	private void makeVisibleCallback()
+	{
+		auto yaw = (cos(makeVisibleTimer.phase * PI * 2) * (1-makeVisibleTimer.phase ^^ 0.75)) * PI * 0.5;
+		uiTransform.rotation = quat.eulerRotation(vec3(yaw, 0, 0));
+	}
+
+	private void hideCallback()
+	{
+		auto yaw = sin(hideTimer.phase * PI * 0.5) * PI * 0.5;
+		uiTransform.rotation = quat.eulerRotation(vec3(yaw, 0, 0));
 	}
 
 	void frameUpdate()
 	{
 		auto camera = cameraSelection.mainCamera;
-		
-		auto uiTransform = uiRootEntity.components.first!Transform;
+
 		auto clipCoords = camera.viewProjectionMatrix * vec4(transform.position, 1);
 		uiTransform.position = vec3(clipCoords.xy / clipCoords.w, 0);
 
@@ -128,6 +162,35 @@ final class Sensor : Component
 			currentData = data;
 		}
 	}
+
+	auto worldSpaceBound()
+	{
+		return locationIndicator.meshRenderer.worldSpaceBound;
+	}
+
+	@property
+	{
+		bool visible() { return _visible; }
+
+		void visible(bool newVisible)
+		{
+			if(newVisible != _visible)
+			{
+				_visible = newVisible;
+
+				if(newVisible)
+				{
+					makeVisibleTimer.start();
+					hideTimer.stop();
+				}
+				else
+				{
+					hideTimer.start();
+					makeVisibleTimer.stop();
+				}
+			}
+		}
+	}
 }
 
 final class SensorLocationIndicator : Component
@@ -153,6 +216,63 @@ final class SensorLocationIndicator : Component
 		meshRenderer.mesh.renderState.shader.uniforms["color"] = lerp(vec3(0, 1, 0), vec3(), smoothStep(0, 2, timeSinceUpdate));
 		timeSinceUpdate += time.delta;
 	}
+
+	@property auto worldSpaceBound()
+	{
+		return meshRenderer.worldSpaceBound;
+	}
+}
+
+final class SensorClickedListener : SceneComponent
+{
+	private @dependency
+	{
+		SensorPartitioning partitioning;
+		CameraSelection cameraSelection;
+	}
+
+	private
+	{
+		bool mouseNotMoved;
+		vec2 mouseClipCoords;
+	}
+
+	void frameUpdate()
+	{
+		import kratos.input;
+
+		if(mouse.buttons[0].justPressed)
+		{
+			mouseNotMoved = true;
+			mouseClipCoords = mouse.clipPointer.position;
+		}
+
+		if(mouse.buttons[0].pressed)
+		{
+			mouseNotMoved &= mouse.clipPointer.position == mouseClipCoords;
+		}
+
+		if(mouse.buttons[0].justReleased && mouseNotMoved)
+		{
+			auto pickRay = cameraSelection.mainCamera.createPickRay(mouseClipCoords);
+			auto selectedSensors = partitioning.intersecting(pickRay);
+
+			foreach(sensor; selectedSensors)
+			{
+				sensor.visible = !sensor.visible;
+			}
+		}
+
+		if(keyboard["Space"].justPressed)
+		{
+			import std.algorithm.searching : any;
+			auto makeVisible = !partitioning.all.any!(a => a.visible);
+			foreach(sensor; partitioning.all)
+			{
+				sensor.visible = makeVisible;
+			}
+		}
+	}
 }
 
 final class SensorDataSource : SceneComponent
@@ -166,6 +286,8 @@ final class SensorDataSource : SceneComponent
 
 	void initialize()
 	{
+		scene.components.add!SensorClickedListener;
+
 		testSensorData =
 		[
 			SensorData("Test Sensor 1", vec2d(51.897877, 4.418614)),
@@ -182,9 +304,9 @@ final class SensorDataSource : SceneComponent
 
 		if((updateIn -= time.delta) <= 0)
 		{
-			updateIn = 2;
-
 			import std.random : uniform;
+
+			updateIn = uniform(0.5, 2.0);
 
 			auto sensorToUpdate = uniform(0, testSensorData.length);
 
