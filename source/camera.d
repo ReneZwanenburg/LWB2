@@ -3,7 +3,6 @@ import kratos.component.transform;
 import kratos.component.camera;
 import kratos.component.time;
 import kgl3n;
-import kgl3n.math : smoothStep;
 import std.math;
 
 class CameraAnchor : Component
@@ -56,19 +55,33 @@ class CameraMovement : Component
 {
 	@optional:
 	float distanceScale = 1.25;
+	float zoomTime = 0.25;
 
 	private Transformation startTransformation;
 	private Transformation targetTransformation;
 	
 	private @dependency(Dependency.Direction.Write) Transform transform;
-	private @dependency Time time;
 
-	private float interpTimeRemaining = 0;
-	private float interpTime = 0.33;
+	private Timer zoomTimer;
 
 	void initialize()
 	{
 		targetTransformation = transform.localTransformation;
+		
+		zoomTimer = owner.components.add!Timer(zoomTime);
+		zoomTimer.onStart += & zoomStart;
+		zoomTimer.onUpdate += & zoomUpdate;
+	}
+	
+	private void zoomStart()
+	{
+		startTransformation = transform.localTransformation;
+	}
+	
+	private void zoomUpdate()
+	{
+		transform.localTransformation = 
+			Transformation.interpolate(startTransformation, targetTransformation, zoomTimer.smoothPhase);
 	}
 
 	void frameUpdate()
@@ -78,18 +91,12 @@ class CameraMovement : Component
 		if(mouse.scrollDown.pressed)
 		{
 			targetTransformation.position.z *= distanceScale;
-			interpTimeRemaining = interpTime;
-			startTransformation = transform.localTransformation;
+			zoomTimer.start();
 		}
 		if(mouse.scrollUp.pressed)
 		{
 			targetTransformation.position.z /= distanceScale;
-			interpTimeRemaining = interpTime;
-			startTransformation = transform.localTransformation;
+			zoomTimer.start();
 		}
-
-		transform.localTransformation = Transformation.interpolate(startTransformation, targetTransformation, smoothStep(interpTime*2, 0, interpTimeRemaining));
-
-		interpTimeRemaining = clamp(interpTimeRemaining - time.delta, 0, interpTime);
 	}
 }

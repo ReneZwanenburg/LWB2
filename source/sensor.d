@@ -5,6 +5,7 @@ import kratos.component.meshrenderer;
 import kratos.component.camera;
 import kratos.component.time;
 import kratos.component.spatialpartitioning;
+import kratos.graphics.shadervariable : UniformRef;
 import kratos.ui.panel;
 import kratos.ecs;
 import kratos.util;
@@ -20,7 +21,14 @@ alias SensorPartitioning = SpatialPartitioning!Sensor;
 
 final class Sensor : Component
 {
-	SensorId id;
+	@optional
+	{
+		float showAnimationTime = 0.4;
+		float hideAnimationTime = 0.25;
+		
+		vec3 readingColor = vec3();
+		vec3 readingUpdatedColor = vec3(0, 1, 0);
+	}
 
 	private @dependency
 	{
@@ -29,7 +37,8 @@ final class Sensor : Component
 		CameraSelection cameraSelection;
 		Time time;
 	}
-
+	
+	private SensorId id;
 	private SensorData currentData;
 
 	private Entity uiRootEntity;
@@ -142,7 +151,7 @@ final class Sensor : Component
 
 	void receive(SensorData data)
 	{
-		locationIndicator.timeSinceUpdate = 0;
+		locationIndicator.updateTimer.start();
 
 		if(data !is currentData)
 		{
@@ -195,26 +204,44 @@ final class Sensor : Component
 
 final class SensorLocationIndicator : Component
 {
+	@optional
+	{
+		float updateAnimationTime = 2;
+		vec3 indicatorColor = vec3();
+		vec3 updatedIndicatorColor = vec3(0, 1, 0);
+	}
+
 	private @dependency
 	{
 		Transform transform;
 		CameraSelection cameraSelection;
-		Time time;
+	}
+	
+	private static struct Uniforms
+	{
+		UniformRef!vec3 color;
 	}
 
-	private float timeSinceUpdate = 0;
 	private MeshRenderer meshRenderer;
+	private Uniforms uniforms;
+	private Timer updateTimer;
 
 	void initialize()
 	{
 		meshRenderer = owner.components.add!MeshRenderer("Meshes/SensorLocationIndicator.obj", "RenderStates/SensorLocationIndicator.renderstate");
+		uniforms = meshRenderer.mesh.renderState.shader.uniforms.getRefs!Uniforms;
+		updateTimer = owner.components.add!Timer(updateAnimationTime);
+		updateTimer.onUpdate += &onUpdated;
+	}
+	
+	void onUpdated()
+	{
+		uniforms.color = lerp(updatedIndicatorColor, indicatorColor, updateTimer.smoothPhase);
 	}
 
 	void frameUpdate()
 	{
 		transform.scale = (transform.worldPosition - cameraSelection.mainCamera.transform.worldPosition).magnitude;
-		meshRenderer.mesh.renderState.shader.uniforms["color"] = lerp(vec3(0, 1, 0), vec3(), smoothStep(0, 2, timeSinceUpdate));
-		timeSinceUpdate += time.delta;
 	}
 
 	@property auto worldSpaceBound()
