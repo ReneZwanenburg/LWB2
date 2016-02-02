@@ -9,6 +9,7 @@ import kratos.graphics.shadervariable : UniformRef;
 import kratos.ui.panel;
 import kratos.ecs;
 import kratos.util;
+import kratos.resource.loader.jsonloader;
 import rdconvert;
 
 import kgl3n;
@@ -113,7 +114,8 @@ final class Sensor : Component
 		}
 
 		auto indicatorEntity = scene.createEntity();
-		locationIndicator = indicatorEntity.components.add!SensorLocationIndicator;
+		indicatorEntity.components.merge(loadJson("Components/SensorLocationIndicator.component"));
+		locationIndicator = indicatorEntity.components.first!SensorLocationIndicator;
 		locationIndicator.transform.parent = transform;
 
 		makeVisibleTimer = owner.components.add!Timer(0.4);
@@ -214,6 +216,7 @@ final class SensorLocationIndicator : Component
 	private @dependency
 	{
 		Transform transform;
+		MeshRenderer meshRenderer;
 		CameraSelection cameraSelection;
 	}
 	
@@ -222,13 +225,11 @@ final class SensorLocationIndicator : Component
 		UniformRef!vec3 color;
 	}
 
-	private MeshRenderer meshRenderer;
 	private Uniforms uniforms;
 	private Timer updateTimer;
 
 	void initialize()
 	{
-		meshRenderer = owner.components.add!MeshRenderer("Meshes/SensorLocationIndicator.obj", "RenderStates/SensorLocationIndicator.renderstate");
 		uniforms = meshRenderer.mesh.renderState.shader.uniforms.getRefs!Uniforms;
 		updateTimer = owner.components.add!Timer(updateAnimationTime);
 		updateTimer.onUpdate += &onUpdated;
@@ -242,11 +243,6 @@ final class SensorLocationIndicator : Component
 	void frameUpdate()
 	{
 		transform.scale = (transform.worldPosition - cameraSelection.mainCamera.transform.worldPosition).magnitude;
-	}
-
-	@property auto worldSpaceBound()
-	{
-		return meshRenderer.worldSpaceBound;
 	}
 }
 

@@ -11,4 +11,5 @@ static this()
 	registerComponent!CameraAnchor;
 	registerComponent!CameraMovement;
 	registerComponent!SensorClickedListener;
+	registerComponent!SensorLocationIndicator;
 }

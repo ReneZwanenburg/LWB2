@@ -1,0 +1,14 @@
+[
+	{
+		"type": "sensor.SensorLocationIndicator"
+	},
+	
+	{
+		"type": "kratos.component.meshrenderer.MeshRenderer",
+		"representation":
+		{
+			"mesh": "Meshes/SensorLocationIndicator.obj",
+			"renderState": "RenderStates/SensorLocationIndicator.renderstate"
+		}
+	}
+]
