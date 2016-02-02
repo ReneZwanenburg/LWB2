@@ -1,7 +1,0 @@
-{
-	"modules":
-	[
-		"Shaders/Simple.vert",
-		"Shaders/Simple.frag"
-	]
-}

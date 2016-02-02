@@ -1,7 +1,7 @@
 {
 	"Shader":
 	{
-		"program": "ShaderPrograms/Simple.prog",
+		"program": "ShaderPrograms/Building.prog",
 		
 		"uniforms":
 		{

@@ -1,0 +1,7 @@
+{
+	"modules":
+	[
+		"Shaders/Building.vert",
+		"Shaders/Building.frag"
+	]
+}
