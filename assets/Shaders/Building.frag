@@ -9,6 +9,6 @@ uniform vec3 color;
 
 void main()
 {
-	albedo = vec4(color, 0.8);
+	albedo = vec4(color, 0.5);
 	normal = vec4(viewNormal * 0.5 + 0.5, 0.5);
 }

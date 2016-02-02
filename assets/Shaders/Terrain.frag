@@ -13,7 +13,7 @@ void main()
 {
 	vec3 albedoSample = texture2D(texture, texCoord).rgb;
 	// Dirty little trick to make the specular highlight a bit more interesting without full blown mapping
-	float specularLevel = dot(albedoSample, vec3(1)) * 0.25 + 0.25;
+	float specularLevel = dot(albedoSample, vec3(1)) * 0.125 + 0.125;
 	
 	albedo = vec4(albedoSample * color, specularLevel);
 	normal = vec4(viewNormal * 0.5 + 0.5, specularLevel + 0.25);
