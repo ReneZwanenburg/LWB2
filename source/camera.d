@@ -75,13 +75,13 @@ class CameraMovement : Component
 	{
 		import kratos.input;
 		
-		if(mouse.scrollDown.justPressed)
+		if(mouse.scrollDown.pressed)
 		{
 			targetTransformation.position.z *= distanceScale;
 			interpTimeRemaining = interpTime;
 			startTransformation = transform.localTransformation;
 		}
-		if(mouse.scrollUp.justPressed)
+		if(mouse.scrollUp.pressed)
 		{
 			targetTransformation.position.z /= distanceScale;
 			interpTimeRemaining = interpTime;
