@@ -8,7 +8,7 @@
 			"type": "kratos.component.transform.Transform",
 			"representation":
 			{
-				"position": [38000, 0, 11000]
+				"position": [36500, 0, 9000]
 			}
 		},
 		
@@ -17,7 +17,7 @@
 			
 			"representation":
 			{
-				"ypr": [0, -1, 0]
+				"ypr": [2.5, -1, 0]
 			}
 		},
 	]
@@ -31,7 +31,7 @@
 			"type": "kratos.component.transform.Transform",
 			"representation":
 			{
-				"position": [0, 0, 250]
+				"position": [0, 0, 1500]
 			}
 		},
 		
