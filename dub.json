@@ -11,6 +11,8 @@
 	
 	"versions": ["StdLoggerDisableLogging"],
 	
+	"lflags": ["/SUBSYSTEM:WINDOWS", "/ENTRY:mainCRTStartup"],
+	
 	"dependencies": 
 	{
 		"kratos": {"path": "../Kratos"}
