@@ -286,8 +286,6 @@ final class SensorDataSource : SceneComponent
 
 	void initialize()
 	{
-		scene.components.add!SensorClickedListener;
-
 		testSensorData =
 		[
 			SensorData("Test Sensor 1", vec2d(51.897877, 4.418614)),

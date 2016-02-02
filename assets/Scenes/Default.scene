@@ -5,6 +5,10 @@
 	[
 		{
 			"type": "sensor.SensorDataSource"
+		},
+		
+		{
+			"type": "sensor.SensorClickedListener"
 		}
 	],
 	

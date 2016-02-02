@@ -2,9 +2,9 @@
 docs.json
 __dummy.html
 *.o
-*.obj
 
 dub.userprefs
 build
 
 UncompressedTerrain
+Obj
