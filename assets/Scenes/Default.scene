@@ -4,7 +4,11 @@
 	"components":
 	[
 		{
-			"type": "sensor.SensorDataSource"
+			"type": "sensor.SensorTestDataSource"
+		},
+		
+		{
+			"type": "sensor.SensorMqttDataSource"
 		},
 		
 		{

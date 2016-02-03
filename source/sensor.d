@@ -11,10 +11,14 @@ import kratos.ecs;
 import kratos.util;
 import kratos.resource.loader.jsonloader;
 import rdconvert;
-
 import kgl3n;
 
-import std.stdio;
+import mqttd;
+import std.container.array;
+import std.array : array;
+import std.algorithm.iteration : splitter;
+import core.sync.mutex;
+import kvibe.data.json;
 
 alias SensorId = string;
 
@@ -33,7 +37,6 @@ final class Sensor : Component
 
 	private @dependency
 	{
-		SensorDataSource dataSource;
 		Transform transform;
 		CameraSelection cameraSelection;
 		Time time;
@@ -45,10 +48,11 @@ final class Sensor : Component
 	private Entity uiRootEntity;
 	private Transform uiTransform;
 	private TextPanel header;
-	private TextPanel[SensorData.init.data.length] sensorReadings;
-	private float[sensorReadings.length] timeSinceUpdate = 0;
+	private enum numSensorReadings = 4;
+	private TextPanel[numSensorReadings] sensorReadings;
+	private float[numSensorReadings] timeSinceUpdate = 0;
 
-	private immutable string[] readingNames = ["Reading 1", "Reading 2", "Reading 3", "Reading 4"];
+	private string[] readingNames;
 
 	private SensorLocationIndicator locationIndicator;
 
@@ -56,10 +60,11 @@ final class Sensor : Component
 	private Timer hideTimer;
 	private bool _visible;
 
-	this(SensorId id)
+	this(SensorId id, string[] readingNames)
 	{
 		this.id = id;
-		currentData.data[] = float.nan;
+		this.readingNames = readingNames;
+		currentData.data.length = readingNames.length;
 		scene.components.firstOrAdd!SensorPartitioning().register(this);
 	}
 
@@ -164,8 +169,7 @@ final class Sensor : Component
 			{
 				if(value != currentData.data[i])
 				{
-					import std.conv : text;
-					sensorReadings[i].text = value.text;
+					sensorReadings[i].text = value;
 					timeSinceUpdate[i] = 0;
 				}
 			}
@@ -298,7 +302,7 @@ final class SensorClickedListener : SceneComponent
 	}
 }
 
-final class SensorDataSource : SceneComponent
+final class SensorTestDataSource : SceneComponent
 {
 	private Sensor[SensorId] sensors;
 	private SensorData[] testSensorData;
@@ -306,58 +310,197 @@ final class SensorDataSource : SceneComponent
 	private float updateIn = 0;
 
 	private @dependency Time time;
+	
+	private bool enabled = false;
 
 	void initialize()
 	{
 		testSensorData =
 		[
-			SensorData("Test Sensor 1", vec2d(51.897877, 4.418614)),
-			SensorData("Test Sensor 2", vec2d(51.917301, 4.484350)),
-			SensorData("Test Sensor 3", vec2d(51.924411, 4.477744)),
-			SensorData("Test Sensor 4", vec2d(51.922973, 4.496150))
+			SensorData("Test Sensor 1", vec2d(51.917301, 4.484350)),
+			SensorData("Test Sensor 2", vec2d(51.924411, 4.477744)),
+			SensorData("Test Sensor 3", vec2d(51.922973, 4.496150))
 		];
+		
+		foreach(ref sensor; testSensorData)
+		{
+			sensor.data.length = 4;
+		}
 	}
 
 	void frameUpdate()
 	{
-		//TODO: Get input range of new messages
-		SensorData[] received;
-
-		if((updateIn -= time.delta) <= 0)
+		import kratos.input;
+		if(keyboard["F1"].justPressed) enabled = !enabled;
+		
+		if(enabled && (updateIn -= time.delta) <= 0)
 		{
 			import std.random : uniform;
 
 			updateIn = uniform(0.5, 2.0);
 
-			auto sensorToUpdate = uniform(0, testSensorData.length);
+			auto data = testSensorData[uniform(0, testSensorData.length)];
 
-			foreach(ref val; testSensorData[sensorToUpdate].data)
+			foreach(ref val; data.data)
 			{
-				val = uniform(0, 5);
+				import std.conv : text;
+				val = uniform(0, 5).text;
 			}
 
-			received ~= testSensorData[sensorToUpdate];
-		}
-
-		foreach(data; received)
-		{
-			auto sensor = sensors.getOrAdd(data.id, createNewSensor(data.id));
-			sensor.receive(data);
+			sensors.getOrAdd(data.id, createNewSensor(data.id)).receive(data);
 		}
 	}
 
 	private Sensor createNewSensor(SensorId id)
 	{
 		auto entity = scene.createEntity("Sensor " ~ id);
-		return entity.components.add!Sensor(id);
+		return entity.components.add!Sensor(id, ["Temp", "Humidity", "Air pressure", "Power"]);
 	}
+}
+
+final class SensorMqttDataSource : SceneComponent
+{
+	private Subscriber subscriber;
+	private MqttConfiguration config;
+	
+	private Array!SensorData messageQueue;
+	private Mutex queueMutex;
+	
+	private Sensor[SensorId] sensors;
+	
+	string configurationFile = "MqttConfig.json";
+	
+	this()
+	{
+		queueMutex = new Mutex();
+	}
+	
+	void initialize()
+	{
+		config = deserializeJson!MqttConfiguration(loadJson(configurationFile));
+		
+		import core.thread;
+		
+		auto thread = new Thread(()
+		{
+			subscriber = new Subscriber(config, &handlePacket);
+			subscriber.connect();
+			
+			import vibe.core.core : runEventLoop;
+			runEventLoop();
+		});
+		
+		thread.isDaemon = true;
+		thread.start();
+	}
+	
+	~this()
+	{
+		subscriber.disconnect();
+	}
+	
+	void frameUpdate()
+	{
+		synchronized(queueMutex)
+		{
+			foreach(data; messageQueue[])
+			{
+				auto sensor = sensors.getOrAdd(data.id, createNewSensor(data.id));
+				sensor.receive(data);
+			}
+			
+			messageQueue.clear();
+		}
+	}
+
+	private Sensor createNewSensor(SensorId id)
+	{
+		auto entity = scene.createEntity("Sensor " ~ id);
+		return entity.components.add!Sensor(id, config.sensorNames);
+	}
+	
+	// Called from event loop thread
+	private void handlePacket(Publish packet)
+	{
+		auto payloadStr = cast(string)packet.payload;
+		auto message = parseJson(payloadStr);
+		SensorData data;
+		
+		data.id = message["devEUI"].get!string;
+		data.latLong = vec2d(message["lrrLAT"].get!double, message["lrrLON"].get!double);
+		data.data = message["payloadHex"].get!string.splitter(config.messageSplitter).array;
+		
+		if(data.data.length > config.sensorNames.length)
+		{
+			data.data.length = config.sensorNames.length;
+		}
+		
+		synchronized(queueMutex)
+		{
+			messageQueue.insertBack(data);
+		}
+	}
+}
+
+private class Subscriber : MqttClient
+{
+	alias PublishHander = void delegate(Publish);
+
+	private MqttConfiguration config;
+	private PublishHander handler;
+
+	this(MqttConfiguration config, PublishHander publishHandler)
+	{
+		this.config = config;
+		this.handler = publishHandler;
+	
+		Settings settings;
+		settings.host = config.host;
+		settings.port = config.port;
+		settings.clientId = "Sensor Data Viewer";
+		settings.userName = config.userName;
+		settings.password = config.password;
+	
+		super(settings);
+	}
+	
+	override void onPublish(Publish packet)
+	{
+		super.onPublish(packet);
+		try
+		{
+			handler(packet);
+		}
+		catch(Exception e)
+		{
+			// Probably malformed packet. Just swallow for now.
+		}
+	}
+
+    override void onConnAck(ConnAck packet)
+	{
+        super.onConnAck(packet);
+        this.subscribe([config.topic]);
+    }
+}
+
+struct MqttConfiguration
+{
+	string host;
+	ushort port;
+	string userName;
+	string password;
+	string topic;
+	
+	string messageSplitter;
+	string[] sensorNames;
 }
 
 struct SensorData
 {
 	SensorId id;
 	vec2d latLong;
-	float[4] data = 0;
+	string[] data;
 }
 
 private static vec2d rdToWorld(vec2d rd)
@@ -368,5 +511,6 @@ private static vec2d rdToWorld(vec2d rd)
 
 static this()
 {
-	registerComponent!SensorDataSource;
+	registerComponent!SensorTestDataSource;
+	registerComponent!SensorMqttDataSource;
 }

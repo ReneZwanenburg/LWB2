@@ -1,0 +1,10 @@
+{
+	"host": "m20.cloudmqtt.com",
+	"port": 12345,
+	"userName": "username",
+	"password": "password",
+	"topic": "LORA",
+	
+	"messageSplitter": ", ",
+	"sensorNames": ["Temp", "Humidity", "Air pressure", "Power"]
+}

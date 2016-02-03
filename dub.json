@@ -11,10 +11,10 @@
 	
 	"versions": ["StdLoggerDisableLogging"],
 	
-	"lflags": ["/SUBSYSTEM:WINDOWS", "/ENTRY:mainCRTStartup"],
-	
 	"dependencies": 
 	{
-		"kratos": {"path": "../Kratos"}
+		"kratos": {"path": "../Kratos"},
+		"vibe-mqtt": "~>0.1.1",
+		"vibe-d": "~>0.7.25"
 	}
 }
