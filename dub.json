@@ -6,6 +6,7 @@
 
 	"targetType": "executable",
 	"targetPath": "build",
+	"targetName": "SensorDataViewer",
 	"workingDirectory": "build",
 	"preBuildCommands": ["CompileResources.bat"],
 	
