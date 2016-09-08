@@ -3,12 +3,13 @@ import kratos.component.camera;
 import kratos.component.meshrenderer;
 import kratos.component.transform;
 import kratos.resource.loader.textureloader;
+import kratos.graphics.texture;
 import kgl3n;
 
 class TerrainTile : Component
 {
 	string textureName;
-
+	
 	private
 	{
 		@dependency
@@ -25,12 +26,12 @@ class TerrainTile : Component
 
 	void frameUpdate()
 	{
-		auto distance = (cameraSelection.mainCamera.transform.worldPosition - transform.worldPosition).magnitude;
+		auto distance = (cameraSelection.mainCamera.transform.worldTransformation.position - transform.worldTransformation.position).magnitude;
 		auto lod = (distance / 1024).max(0).log2.max(0).to!uint;
 		
 		if(currentLevel != lod)
 		{
-			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = loadTexture(textureName, lod);
+			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = TextureManager.add(loadTexture(textureName, lod));
 			currentLevel = lod;
 		}
 	}

@@ -1,19 +1,20 @@
 {
+	"fileVersion": 1,
 	"versions": {
-		"libasync": "0.7.5",
-		"memutils": "0.4.4",
-		"derelict-ode": "1.1.2",
-		"derelict-gl3": "1.0.17",
-		"derelict-il": "~master",
-		"openssl": "1.1.4+1.0.1g",
-		"vibe-d": "0.7.26",
-		"derelict-glfw3": "1.1.0",
-		"derelict-util": "2.0.4",
-		"libevent": "2.0.1+2.0.16",
-		"derelict-ft": "1.0.2",
 		"derelict-assimp3": "1.0.1",
+		"derelict-ft": "1.0.2",
+		"derelict-gl3": "1.0.19",
+		"derelict-glfw3": "1.1.1",
+		"derelict-il": "1.0.0",
+		"derelict-ode": "1.1.2",
+		"derelict-util": "2.0.6",
+		"kratos": {"path":"../Kratos"},
+		"libasync": "0.7.9",
 		"libev": "5.0.0+4.04",
-		"vibe-mqtt": "0.1.1"
-	},
-	"fileVersion": 1
+		"libevent": "2.0.1+2.0.16",
+		"memutils": "0.4.7",
+		"openssl": "1.1.4+1.0.1g",
+		"vibe-d": "0.7.29",
+		"vibe-mqtt": "0.1.6"
+	}
 }

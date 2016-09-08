@@ -18,7 +18,7 @@ import std.container.array;
 import std.array : array;
 import std.algorithm.iteration : splitter;
 import core.sync.mutex;
-import kvibe.data.json;
+import vibe.data.json;
 
 alias SensorId = string;
 
@@ -246,7 +246,7 @@ final class SensorLocationIndicator : Component
 
 	void frameUpdate()
 	{
-		transform.scale = (transform.worldPosition - cameraSelection.mainCamera.transform.worldPosition).magnitude;
+		transform.scale = (transform.worldTransformation.position - cameraSelection.mainCamera.transform.worldTransformation.position).magnitude;
 	}
 }
 
