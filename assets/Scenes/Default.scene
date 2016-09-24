@@ -18,9 +18,9 @@
 	
 	"entities":
 	[
-		"Entities/Sun.entity",
-		"Entities/SimpleCamera.entity",
-		"Entities/Terrain.entity",
-		"Entities/Rotterdam.entity"
+		"Entities/Sun",
+		"Entities/SimpleCamera",
+		"Entities/Terrain",
+		"Entities/Rotterdam"
 	]
 }

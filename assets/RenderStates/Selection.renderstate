@@ -9,11 +9,11 @@
 	
 	"Shader":
 	{
-		"program": "ShaderPrograms/Selection.prog",
+		"program": "ShaderPrograms/Selection",
 		
 		"uniforms":
 		{
-			"texture": "Textures/Selection.png"
+			"texture": "Textures/Selection"
 		}
 	}
 }

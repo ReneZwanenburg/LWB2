@@ -1,3 +1,3 @@
 {
-	"parent": "RenderStates/UI/TextPanel.renderstate"
+	"parent": "RenderStates/UI/TextPanel"
 }

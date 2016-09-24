@@ -1,12 +1,12 @@
 {
 	"Shader":
 	{
-		"program": "ShaderPrograms/Terrain.prog",
+		"program": "ShaderPrograms/Terrain",
 		
 		"uniforms":
 		{
 			"color": [1, 1, 1],
-			"texture": "Textures/Black.png"
+			"texture": "Textures/Black"
 		}
 	}
 }

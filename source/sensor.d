@@ -76,18 +76,18 @@ final class Sensor : Component
 	void initialize()
 	{
 		enum
-			fontFile = "Fonts/OpenSans-Regular.ttf";
+			fontFile = "Fonts/OpenSans-Regular";
 
 		enum 
 			panelSize = vec2(0.5, 0.2),
 			panelOffset = vec2(0, 0.2),
-			panelRenderState = "RenderStates/SensorPanelBackground.renderstate";
+			panelRenderState = "RenderStates/SensorPanelBackground";
 
 		enum
 			headerFontSize = 0.05f,
 			headerSize = vec2(panelSize.x - 0.05, headerFontSize),
 			headerOffset = vec2(0, panelSize.y / 2 - headerFontSize / 2) + panelOffset,
-			headerRenderState = "RenderStates/SensorPanelHeader.renderstate";
+			headerRenderState = "RenderStates/SensorPanelHeader";
 
 		enum
 			numReadings = sensorReadings.length,
@@ -119,7 +119,7 @@ final class Sensor : Component
 		}
 
 		auto indicatorEntity = scene.createEntity();
-		indicatorEntity.components.merge(loadJson("Components/SensorLocationIndicator.component"));
+		indicatorEntity.components.merge(loadJson("Components/SensorLocationIndicator"));
 		locationIndicator = indicatorEntity.components.first!SensorLocationIndicator;
 		locationIndicator.transform.parent = transform;
 
@@ -368,7 +368,7 @@ final class SensorMqttDataSource : SceneComponent
 	
 	private Sensor[SensorId] sensors;
 	
-	string configurationFile = "MqttConfig.json";
+	string configurationFile = "MqttConfig";
 	
 	this()
 	{

@@ -12,12 +12,12 @@
 
 	"Shader":
 	{
-		"program": "ShaderPrograms/UI/Panel.prog",
+		"program": "ShaderPrograms/UI/Panel",
 		
 		"uniforms":
 		{
 			"color": [1, 1, 1, 1],
-			"texture": "Textures/SensorPanelBackground.png"
+			"texture": "Textures/SensorPanelBackground"
 		}
 	}
 }

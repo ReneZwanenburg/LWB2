@@ -7,8 +7,8 @@
 		"type": "kratos.component.meshrenderer.MeshRenderer",
 		"representation":
 		{
-			"mesh": "Meshes/SensorLocationIndicator.obj",
-			"renderState": "RenderStates/SensorLocationIndicator.renderstate"
+			"mesh": "Meshes/SensorLocationIndicator",
+			"renderState": "RenderStates/SensorLocationIndicator"
 		}
 	}
 ]

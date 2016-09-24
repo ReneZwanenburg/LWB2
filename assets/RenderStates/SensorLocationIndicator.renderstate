@@ -9,11 +9,11 @@
 	
 	"Shader":
 	{
-		"program": "ShaderPrograms/SensorLocationIndicator.prog",
+		"program": "ShaderPrograms/SensorLocationIndicator",
 		
 		"uniforms":
 		{
-			"texture": "Textures/SensorLocationIndicator.png",
+			"texture": "Textures/SensorLocationIndicator",
 			"color": [0, 0, 0]
 		}
 	}

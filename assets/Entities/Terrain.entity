@@ -1,6 +1,6 @@
 [
-	"Entities/Tiles1.entity",
-	"Entities/Tiles2.entity",
-	"Entities/Tiles3.entity",
-	"Entities/Tiles4.entity"
+	"Entities/Tiles1",
+	"Entities/Tiles2",
+	"Entities/Tiles3",
+	"Entities/Tiles4"
 ]
