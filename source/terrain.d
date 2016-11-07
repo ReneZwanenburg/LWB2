@@ -2,7 +2,7 @@ import kratos.ecs;
 import kratos.component.camera;
 import kratos.component.meshrenderer;
 import kratos.component.transform;
-import kratos.resource.loader.textureloader;
+import kratos.resource.loader.imageloader;
 import kratos.graphics.texture;
 import kgl3n;
 
@@ -31,7 +31,7 @@ class TerrainTile : Component
 		
 		if(currentLevel != lod)
 		{
-			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = TextureManager.add(loadTexture(textureName, lod));
+			meshRenderer.mesh.renderState.shader.uniforms[textureUniformName] = TextureManager.create(loadImage(textureName, lod));
 			currentLevel = lod;
 		}
 	}

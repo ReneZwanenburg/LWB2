@@ -43,7 +43,7 @@
 				"projection":
 				{
 					"nearPlane": 1,
-					"farPlane": 10000
+					"farPlane": 100000
 				}
 			}
 		},

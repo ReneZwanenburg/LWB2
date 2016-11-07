@@ -1,11 +1,11 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"derelict-assimp3": "1.0.1",
+		"derelict-assimp3": "1.0.5",
 		"derelict-ft": "1.0.2",
 		"derelict-gl3": "1.0.19",
 		"derelict-glfw3": "1.1.1",
-		"derelict-il": "1.0.0",
+		"derelict-il": "1.0.1",
 		"derelict-ode": "1.1.2",
 		"derelict-util": "2.0.6",
 		"kratos": {"path":"../Kratos"},
@@ -15,6 +15,6 @@
 		"memutils": "0.4.7",
 		"openssl": "1.1.4+1.0.1g",
 		"vibe-d": "0.7.29",
-		"vibe-mqtt": "0.1.6"
+		"vibe-mqtt": "0.1.7"
 	}
 }
