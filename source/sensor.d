@@ -13,12 +13,12 @@ import kratos.resource.loader.jsonloader;
 import rdconvert;
 import kgl3n;
 
-import mqttd;
+//import mqttd;
 import std.container.array;
 import std.array : array;
 import std.algorithm.iteration : splitter;
 import core.sync.mutex;
-import vibe.data.json;
+//import vibe.data.json;
 
 alias SensorId = string;
 
@@ -358,6 +358,7 @@ final class SensorTestDataSource : SceneComponent
 	}
 }
 
+/*
 final class SensorMqttDataSource : SceneComponent
 {
 	private Subscriber subscriber;
@@ -495,6 +496,7 @@ struct MqttConfiguration
 	string messageSplitter;
 	string[] sensorNames;
 }
+*/
 
 struct SensorData
 {
@@ -512,5 +514,5 @@ private static vec2d rdToWorld(vec2d rd)
 static this()
 {
 	registerComponent!SensorTestDataSource;
-	registerComponent!SensorMqttDataSource;
+	//registerComponent!SensorMqttDataSource;
 }

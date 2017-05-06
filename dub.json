@@ -14,8 +14,6 @@
 	
 	"dependencies": 
 	{
-		"kratos": {"path": "../Kratos"},
-		"vibe-mqtt": "~>0.1.6",
-		"vibe-d": "~>0.7.25"
+		"kratos": {"path": "../Kratos"}
 	}
 }
