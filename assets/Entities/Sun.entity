@@ -6,7 +6,8 @@
 			"type": "kratos.component.light.DirectionalLight",
 			"representation": {
 				"color": [1, 1, 1],
-				"direction": [-0.1, -1, -1.5]
+				"direction": [-0.1, -1, -1.5],
+				"ambientColor": [0.1, 0.1, 0.1]
 			}
 		}
 	]
